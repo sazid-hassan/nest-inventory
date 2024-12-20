@@ -1,0 +1,41 @@
+services:
+  app:
+    container_name: ims-nest-api-starter
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/var/www/ims-nest-api-starter/src
+      - ./test:/var/www/ims-nest-api-starter/test
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    container_name: ims-nest-postgres
+    environment:
+      POSTGRES_DB: ims_nest
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:7-alpine
+    container_name: ims-nest-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes  # For data persistence
+    restart: unless-stopped
+
+
+volumes:
+  postgres_data:
+  redis_data:
